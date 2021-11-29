@@ -1,0 +1,203 @@
+# write your code here
+error_msg = ["Do you even know what numbers are? Stay focused!" , "Yes ... an interesting math operation. You've slept through all classes, haven't you?"]
+#CHECK
+msg_zero = "Yeah... division by zero. Smart move..."
+error_number = 0
+
+dict_msg = {
+    "msg_0" : "Enter an equation",
+    "msg_1" : "Do you even know what numbers are? Stay focused!",
+    "msg_2" : "Yes ... an interesting math operation. You've slept through all classes, haven't you?",
+    "msg_3" : "Yeah... division by zero. Smart move...",
+    "msg_4" : "Do you want to store the result? (y / n):",
+    "msg_5" : "Do you want to continue calculations? (y / n):",
+    "msg_6" : " ... lazy",
+    "msg_7" : " ... very lazy",
+    "msg_8" : " ... very, very lazy",
+    "msg_9" : "You are",
+    "msg_10" : "Are you sure? It is only one digit! (y / n)",
+    "msg_11" : "Don't be silly! It's just one number! Add to the memory? (y / n)",
+    "msg_12" : "Last chance! Do you really want to embarrass yourself? (y / n)"
+}
+
+memory = 0
+msg_0 = "Enter an equation"
+
+
+msg_1 = "Do you even know what numbers are? Stay focused!"
+
+msg_2 = "Yes ... an interesting math operation. You've slept through all classes, haven't you?"
+msg_3 = "Yeah... division by zero. Smart move..."
+msg_4 = "Do you want to store the result? (y / n):"
+msg_5 = "Do you want to continue calculations? (y / n):"
+msg_6 = " ... lazy"
+msg_7 = " ... very lazy"
+msg_8 = " ... very, very lazy"
+msg_9 = "You are"
+msg_10 = "Are you sure? It is only one digit! (y / n)"
+msg_11 = "Don't be silly! It's just one number! Add to the memory? (y / n)"
+msg_12 = "Last chance! Do you really want to embarrass yourself? (y / n)"
+
+
+def numeric1(eq_list):
+    y = ""
+    x =""
+    equation = " ".join(eq_list)
+    if '+' in equation:
+        y = equation.split('+')
+        x = float(y[0]) + float(y[1])
+    elif '-' in equation:
+        y = equation.split('-')
+        x = float(y[0]) - float(y[1])
+    elif '/' in equation:
+        y = equation.split('/')
+        if float(y[1]) == 0:
+            return "msg_3"
+        x = float(y[0]) / float(y[1])
+    elif '*' in equation:
+        y = equation.split('*')
+        x = float(y[0]) * float(y[1])
+    return x
+
+
+def print_error_msg():
+    global error_number
+    print (error_msg[error_number])
+    error_number += 1
+    if error_number == 2:
+        error_number = 0
+
+
+def check_type(arg, kind = "num"):
+    if kind == "num":
+        try:
+            arg = float(arg)
+            return True
+        except:
+            return False
+
+    elif kind == "operator":
+        if arg in "/+*-":
+            return True
+        else:
+            return False
+    else:
+        raise("j")
+
+def is_integer(n):
+    try:
+        float(n)
+    except ValueError:
+        return False
+    else:
+        return float(n).is_integer()
+
+def is_one_digit(arg):
+    if is_integer(arg) == True:
+        arg = float(arg)
+        if  arg > -10 and arg < 10:
+            return True
+    else:
+        return False
+
+def validate_answer(ans):
+    global memory
+    #ans = all([ check_type(equation[0], "num") , check_type(equation[1], "operator") , check_type(equation[2], "num")])
+    # if equation[1] == "/" and equation[2] == "0":
+    #     print(msg_zero)
+    #     continue
+
+    if is_one_digit(ans) == True:
+        msg_index = 10
+        while True:
+            a  = "msg_" + str(msg_index)
+            #print(a)
+            print(dict_msg["msg_" + str(msg_index)]      )
+            res = input()
+            if res == "y":
+                msg_index += 1
+                if msg_index < 13:
+                    continue
+                else:
+                    memory = ans
+                    return
+            else:
+                return
+    else:
+        memory = ans
+        return
+
+    return
+
+def read_calc():
+    global error_number, memory
+    while True:
+        print("Enter an equation")
+        res = input()
+        res = res.split()
+        res = [x.strip() for x in res]
+        # use MEMOEY
+        if res[0] == "M":
+            res[0] = str(memory)
+
+        if res[2] == "M":
+            res[2] = str(memory)
+
+        if len(res) != 3:
+            print_error_msg()
+            continue
+        else:
+            #check_type(res[0], "num") , check_type(res[1], "operator") , check_type(res[2], "num")])
+            msg = ""
+
+            if is_one_digit(res[0]) and is_one_digit(res[2]):
+                msg += msg_6
+            if (res[0] == "1" or res[2] == "1") and res[1] in "*":
+                msg += msg_7
+            if (res[0] == "0" or res[2] == "0") and res[1] in "*+-":
+                msg += msg_8
+            if msg != "":
+                msg  = msg_9 + msg
+            else:
+                msg = ""    
+            break
+
+    return [res, msg]
+
+while True:
+
+    f = open("output_msg.txt", "a")
+    #print("memory", memory)
+    three_tokens = []
+    [three_tokens ,error_msg] = read_calc()
+    ans  = numeric1(three_tokens)
+    if ans == "msg_3":
+        print(error_msg)
+        print(msg_3)
+        continue
+
+    print(error_msg)
+
+    print(ans)
+    b = " ".join(three_tokens)
+    str_ =  "three_tokens "  + b + "  ans:=" + str(ans) + "mem:   " + str(memory) + "\n"
+    f.write(str_)
+
+    print("Do you want to store the result? (y / n):")
+    res = input()
+    if res == "y":
+        validate_answer(ans)
+    elif res == "n":
+        pass
+
+    print(dict_msg["msg_5"])
+    res = input()
+    if res == "y":
+        continue
+    elif res == "n":
+        break
+
+    f.write("=====================")
+    f.close()
+
+exit()
